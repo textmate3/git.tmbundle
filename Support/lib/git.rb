@@ -164,7 +164,7 @@ module SCM
     end
 
     def list_files(dir, options = {})
-      options[:exclude_file] ||= File.exists?(excl_file = git_dir(dir) + '/info/exclude') ? excl_file : nil
+      options[:exclude_file] ||= File.exist?(excl_file = git_dir(dir) + '/info/exclude') ? excl_file : nil
       options[:type] ||= nil
       params = []
       params << "-#{options[:type]}" if options[:type]
