@@ -1,6 +1,5 @@
 # encoding: utf-8
 require ENV['TM_SUPPORT_PATH'] + '/lib/ui.rb'
-require "#{ENV["TM_SUPPORT_PATH"]}/lib/osx/plist"
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/progress"
 require "#{ENV["TM_SUPPORT_PATH"]}/lib/tm/detach"
 require LIB_ROOT + '/date_helpers.rb'
