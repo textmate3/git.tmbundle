@@ -16,7 +16,7 @@ describe RemoteController do
   describe "fetching" do
     before(:each) do
       # query the remotes
-      @git.should_receive(:log).with(:path=>".", :revisions=>["74c0fdf", "d1c6bdd"], :limit => 5, :git_path => @git.path).and_return(parse_log(fixture_file("log_with_diffs.txt")))
+      @git.should_receive(:log).with({:path=>".", :revisions=>["74c0fdf", "d1c6bdd"], :limit => 5, :git_path => @git.path}).and_return(parse_log(fixture_file("log_with_diffs.txt")))
       
       Git.command_response["fetch", "origin"] = fixture_file("fetch_1_5_4_3_output.txt")
       

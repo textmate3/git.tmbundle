@@ -37,7 +37,7 @@ module SpecHelpers
     [:name, :tracking_branch_name].each do |key|
       next unless options[key]
       branch.stub(key).with(:long).and_return(options[key])
-      branch.stub(key).with().and_return(options[key].gsub(/refs\/(heads|remotes)\//, ""))
+      branch.stub(key).with(no_args).and_return(options[key].gsub(/refs\/(heads|remotes)\//, ""))
     end
     if options.has_key?(:remote)
       branch.stub(:remote).and_return(double("remote", :name => options[:remote]))
@@ -49,6 +49,6 @@ module SpecHelpers
   def stub_current_branch(git, options = {})
     git.branch.stub(:current).and_return(branch_stub(options))
     git.branch.stub(:current_name).with(:long).and_return(git.branch.current.name(:long))
-    git.branch.stub(:current_name).with().and_return(git.branch.current.name)
+    git.branch.stub(:current_name).with(no_args).and_return(git.branch.current.name)
   end
 end

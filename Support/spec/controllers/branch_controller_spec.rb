@@ -104,7 +104,7 @@ EOF
           
           git = Git.singleton_new
           @submodule = double("submodule", :cache => true, :restore => true, :path => "path/to/module", :cached? => true, :cloned? => true, :modified? => false)
-          git.submodule.should_receive(:all).any_number_of_times.and_return([@submodule])
+          git.submodule.stub(:all).and_return([@submodule])
           output = capture_output do
             dispatch(:controller => "branch", :action => "switch")
           end

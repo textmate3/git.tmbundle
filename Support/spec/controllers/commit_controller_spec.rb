@@ -24,7 +24,7 @@ describe CommitController do
         and_return(:rev => "1234567")
         
       @git.should_receive(:diff).
-        with(:path => ".", :revisions => "1234567^..1234567").
+        with({:path => ".", :revisions => "1234567^..1234567"}).
         and_return( Parsers.parse_diff(fixture_file("small.diff")) )
       
       @git.branch.stub(:current_name).and_return("master")
@@ -58,7 +58,7 @@ describe CommitController do
         and_return(:rev => "1234567")
         
       @git.should_receive(:diff).
-        with(:path => ".", :revisions => "1234567^..1234567").
+        with({:path => ".", :revisions => "1234567^..1234567"}).
         and_return( Parsers.parse_diff(fixture_file("small.diff")) )
         
       @git.branch.stub(:current_name).and_return("master")

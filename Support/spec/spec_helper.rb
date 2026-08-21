@@ -9,6 +9,7 @@ ENV['TM_SUPPORT_PATH'] ||= File.expand_path('../../../bundle-support.tmbundle/Su
 require SPEC_ROOT + '/../environment.rb'
 require 'stringio'
 require 'nokogiri'
+require 'rspec/collection_matchers'
 require SPEC_ROOT + "/../tmvc/spec/spec_helpers.rb"
 require LIB_ROOT + "/ui.rb"
 SpecHelpers::PUTS_CAPTURE_CLASSES << ::Git
