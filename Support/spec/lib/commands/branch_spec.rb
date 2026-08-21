@@ -10,17 +10,17 @@ describe SCM::Git::Branch do
   include SpecHelpers
   
   it "should detect when not on a branch" do
-    File.stub!(:read).with(@HEAD_file_path).and_return("12345678")
+    File.stub(:read).with(@HEAD_file_path).and_return("12345678")
     @git.branch.current_name.should == nil
   end
   
   it "should return the short version of the current branch by default" do
-    File.stub!(:read).with(@HEAD_file_path).and_return("ref: refs/heads/master")
+    File.stub(:read).with(@HEAD_file_path).and_return("ref: refs/heads/master")
     @git.branch.current_name.should == "master"
   end
   
   it "should return the long version of the current branch" do
-    File.stub!(:read).with(@HEAD_file_path).and_return("ref: refs/heads/master")
+    File.stub(:read).with(@HEAD_file_path).and_return("ref: refs/heads/master")
     @git.branch.current_name(:long).should == "refs/heads/master"
   end
   
@@ -96,15 +96,15 @@ EOF
     
     it "should know if it's the current branch or not" do
       branch = @git.branch.all(:local).first
-      File.stub!(:read).with(@HEAD_file_path).and_return("ref: #{branch.name(:full)}")
+      File.stub(:read).with(@HEAD_file_path).and_return("ref: #{branch.name(:full)}")
       branch.should be_current
       
-      File.stub!(:read).with(@HEAD_file_path).and_return("1234")
+      File.stub(:read).with(@HEAD_file_path).and_return("1234")
       branch.should_not be_current
     end
     
     it "should return the the current branch" do
-      File.stub!(:read).with(@HEAD_file_path).and_return("ref: refs/heads/master")
+      File.stub(:read).with(@HEAD_file_path).and_return("ref: refs/heads/master")
       @git.branch.current.name.should == "master"
     end
   end
@@ -120,19 +120,19 @@ EOF
     end
     
     it "should get the tracking branch" do
-      @git.config.stub!(:[]).with("branch.master.remote").and_return("origin")
-      @git.config.stub!(:[]).with("branch.master.merge").and_return("refs/heads/master")
+      @git.config.stub(:[]).with("branch.master.remote").and_return("origin")
+      @git.config.stub(:[]).with("branch.master.merge").and_return("refs/heads/master")
       @git.remote["origin"].should_receive(:remote_branch_name_for).with("refs/heads/master", :long).and_return("refs/remotes/origin/master")
       @branch.tracking_branch_name.should == "origin/master"
     end
     
     it "should report the tracking status as nil when no tracking set up" do
-      @git.config.stub!(:[]).with("branch.master.remote").and_return(nil)
+      @git.config.stub(:[]).with("branch.master.remote").and_return(nil)
       @branch.tracking_status.should be_nil
     end
     
     it "should report the tracking status" do
-      @branch.stub!(:tracking_branch_name).with(:long).and_return("refs/remotes/origin/master")
+      @branch.stub(:tracking_branch_name).with(:long).and_return("refs/remotes/origin/master")
       @git.branch.should_receive(:compare_status).with("refs/heads/master", "refs/remotes/origin/master").and_return(:ahead)
       @branch.tracking_status.should == :ahead
     end

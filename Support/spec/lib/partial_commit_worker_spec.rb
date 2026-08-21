@@ -26,14 +26,14 @@ describe PartialCommitWorker do
 
     it "should be NOT be OK to process when there are no file candidates" do
       @commit_worker = @commit_worker
-      @commit_worker.stub!(:file_candidates).and_return([])
+      @commit_worker.stub(:file_candidates).and_return([])
       @commit_worker.nothing_to_commit?.should == true
     end
 
     it "should NOT send the last commit message to the commit window when committing" do
-      @git.stub!(:log).and_return([{:msg => "My Message"}])
-      @commit_worker.stub!(:file_candidates).and_return([])
-      @commit_worker.stub!(:status_helper_tool).and_return("/path/to/status_helper_tool")
+      @git.stub(:log).and_return([{:msg => "My Message"}])
+      @commit_worker.stub(:file_candidates).and_return([])
+      @commit_worker.stub(:status_helper_tool).and_return("/path/to/status_helper_tool")
       @output = @commit_worker.tm_scm_commit_window
       @output.should_not include(Shellwords.escape("My Message"))
     end
@@ -45,19 +45,19 @@ describe PartialCommitWorker do
     end
 
     it "should NOT be OK to proceed when performing an initial commit" do
-      @git.stub!(:initial_commit_pending?).and_return(true)
+      @git.stub(:initial_commit_pending?).and_return(true)
       @commit_worker.nothing_to_amend?.should == true
     end
 
     it "should be OK to amend the commit if there are no files candiates" do
-      @commit_worker.stub!(:file_candidates).and_return([])
+      @commit_worker.stub(:file_candidates).and_return([])
       @commit_worker.nothing_to_commit?.should == false
     end
 
     it "should send the last commit message to the commit window when amending" do
-      @git.stub!(:log).and_return([{:msg => "My Message"}])
-      @commit_worker.stub!(:file_candidates).and_return([])
-      @commit_worker.stub!(:status_helper_tool).and_return("/path/to/status_helper_tool")
+      @git.stub(:log).and_return([{:msg => "My Message"}])
+      @commit_worker.stub(:file_candidates).and_return([])
+      @commit_worker.stub(:status_helper_tool).and_return("/path/to/status_helper_tool")
       @output = @commit_worker.tm_scm_commit_window
       @output.should include(Shellwords.escape("My Message"))
     end

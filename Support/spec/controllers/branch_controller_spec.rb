@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe "deleting branches locally warns and allows you to cancel", :shared => true do
+shared_examples "deleting branches locally warns and allows you to cancel" do
   it "Ask you if you'd like to delete the branch, and then delete it with -D if yes" do
     @set_branch_to_choose.call("task")
     TextMate::UI.should_receive(:alert).with(:informational, "Deleted branch", "Deleted branch task.", "OK")
@@ -16,7 +16,7 @@ describe "deleting branches locally warns and allows you to cancel", :shared => 
 end
 
 
-describe "deleting branches remotely recognizes success and failure responses", :shared => true do
+shared_examples "deleting branches remotely recognizes success and failure responses" do
   it "should delete a remote branch via a push" do
     @set_branch_to_choose.call("origin/task")
     Git.command_response["push", "origin", ":task"] = @success_delete_response
@@ -103,7 +103,7 @@ EOF
           @set_branch_to_choose.call("task")
           
           git = Git.singleton_new
-          @submodule = stub("submodule", :cache => true, :restore => true, :path => "path/to/module", :cached? => true, :cloned? => true, :modified? => false)
+          @submodule = double("submodule", :cache => true, :restore => true, :path => "path/to/module", :cached? => true, :cloned? => true, :modified? => false)
           git.submodule.should_receive(:all).any_number_of_times.and_return([@submodule])
           output = capture_output do
             dispatch(:controller => "branch", :action => "switch")
@@ -122,7 +122,7 @@ EOF
         TextMate::UI.should_receive(:request_string).with(@get_branch_name_params).and_return("release")
         Git.command_response["branch", "--track", "release", "origin/release"] = %{Branch release set up to track remote branch refs/remotes/origin/release.\n}
         Git.command_response["checkout", "release"] = %{Switched to branch "release"\n}
-        @git.submodule.stub!(:all).and_return([])
+        @git.submodule.stub(:all).and_return([])
         output = capture_output do
           dispatch(:controller => "branch", :action => "switch")
         end
@@ -145,8 +145,8 @@ EOF
       before(:each) do
         @git = Git.singleton_new
         @controller = BranchController.singleton_new
-        @git.branch.stub!(:current_name).and_return("master")
-        @git.branch.stub!(:list_names).and_return(["master", "release", "old_skool"])
+        @git.branch.stub(:current_name).and_return("master")
+        @git.branch.stub(:list_names).and_return(["master", "release", "old_skool"])
         
         TextMate::UI.should_receive(:request_item).with(:title => "Merge", :prompt => "Merge which branch into 'master':", :items => ["release", "old_skool"], :force_pick => true).and_return("release")
       end

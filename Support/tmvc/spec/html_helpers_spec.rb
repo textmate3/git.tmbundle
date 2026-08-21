@@ -1,8 +1,10 @@
 require File.dirname(__FILE__) + "/spec_helper.rb"
 describe HtmlHelpers do
+  include HtmlHelpers
+
   def resource_url(arg); arg; end
   it "should output a javascript_include_tag" do
-    javascript_include_tag("prototype.js").should == ["<script src=\"prototype.js\" type=\"text/javascript\"></script>"]
+    javascript_include_tag("prototype.js").should == "<script src=\"prototype.js\" type=\"text/javascript\"></script>"
   end
   
   it "should format options_for_javascript, escaping appropriately" do
@@ -32,7 +34,7 @@ describe HtmlHelpers do
   end
   
   it "should create a link with a url" do
-    link_to_textmate("text", "/hello", 10).should == %q{<a href="txmt://open?url=file:///hello&line=10">text</a>}
+    link_to_textmate("text", "/hello", 10).should == %q{<a href="txmt://open?url=file:///hello&amp;line=10">text</a>}
   end
   
   it "should create a button to a remote" do

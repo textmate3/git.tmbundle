@@ -14,8 +14,8 @@ describe AnnotateController do
       @output = capture_output do 
         dispatch(:controller => "annotate", :file_path => "file.rb")
       end
-      @h = Hpricot(@output)
-      @log_options = (@h / "select[@name='rev'] / option")
+      @h = Nokogiri::HTML(@output)
+      @log_options = (@h / "select[name='rev'] option")
     end
     
     it "should output the log" do

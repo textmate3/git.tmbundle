@@ -4,7 +4,7 @@ describe Git::Stash do
   before(:each) do
     Git.reset_mock!
     @stash_controller = StashController.new
-    StashController.stub!(:new).and_return(@stash_controller)
+    StashController.stub(:new).and_return(@stash_controller)
   end
   
   include SpecHelpers
@@ -30,7 +30,7 @@ EOF
   
   describe "when applying a stash" do
     before(:each) do
-      @stash_controller.stub!(:select_stash).and_return({:description=>" On master: boogy", :name=>"stash@{0}", :id=>0})
+      @stash_controller.stub(:select_stash).and_return({:description=>" On master: boogy", :name=>"stash@{0}", :id=>0})
       Git.command_response["stash", "list"] = fixture_file("stash_list_response_many_stashes.txt")
       Git.command_response["stash", "pop", "stash@{0}"] = fixture_file("status_output.txt")
       Git.command_response["stash", "show", "-p", "stash@{0}"] = fixture_file("changed_files.diff")
@@ -38,7 +38,7 @@ EOF
         dispatch(:controller => "stash", :action => "pop")
       end
     
-      @h = Hpricot(@output)
+      @h = Nokogiri::HTML(@output)
     end
     
     it "should show the project status" do

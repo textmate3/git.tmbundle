@@ -7,8 +7,8 @@ describe RemoteController do
   before(:each) do
     Git.reset_mock!
     @git = Git.singleton_new
-    @git.config.stub!(:[]).with("git-tmbundle.log.limit").and_return(5)
-    @git.config.stub!(:[]).with("branch.master.remote").and_return("origin")
+    @git.config.stub(:[]).with("git-tmbundle.log.limit").and_return(5)
+    @git.config.stub(:[]).with("branch.master.remote").and_return("origin")
     stub_current_branch(@git, :name => "refs/heads/master", :remote => "origin")
     @git.config
   end
@@ -40,8 +40,8 @@ describe RemoteController do
     before(:each) do
       # query the remotes
       @controller = RemoteController.singleton_new
-      @git.branch.current.stub!(:merge).and_return("refs/heads/master")
-      # @git.config.stub!(:[]).with("remote.origin.fetch").and_return("+refs/heads/*:refs/remotes/origin/*")
+      @git.branch.current.stub(:merge).and_return("refs/heads/master")
+      # @git.config.stub(:[]).with("remote.origin.fetch").and_return("+refs/heads/*:refs/remotes/origin/*")
     
       # Git.command_response[] 
       Git.command_response["log", "-p", "791a587..4bfc230", "."] = fixture_file("log_with_diffs.txt")
@@ -74,8 +74,8 @@ describe RemoteController do
     
     describe "to a server with one origin and no submodules" do
       before(:each) do
-        @git.remote.stub!(:names).and_return(['origin'])
-        @git.submodule.stub!(:all).and_return([])
+        @git.remote.stub(:names).and_return(['origin'])
+        @git.submodule.stub(:all).and_return([])
         @output = capture_output do
           dispatch :controller => "remote", :action => "push"
         end
@@ -91,20 +91,20 @@ describe RemoteController do
       end
       
       it "should render the script on the top" do
-        (Hpricot(@output) / "head / script").length.should >= 2
+        (Nokogiri::HTML(@output) / "head script").length.should >= 2
       end
     end
     
     it "should push all submodules that are behind" do
-      @behind_submodule = stub("submodule", :path => "behind", :git => stub("git", :path => "behind", :branch => stub("branch_command", :current => stub("branch", :remote_name => "origin", :name => "master", :tracking_branch_name => "master", :tracking_status => :behind))))
-      @ahead_submodule  = stub("submodule", :path => "ahead",  :git => stub("git", :path => "ahead" , :branch => stub("branch_command", :current => stub("branch", :remote_name => "origin", :name => "master", :tracking_branch_name => "master", :tracking_status => :ahead))))
-      @git.submodule.stub!(:all).and_return([@behind_submodule, @ahead_submodule])
+      @behind_submodule = double("submodule", :path => "behind", :git => double("git", :path => "behind", :branch => double("branch_command", :current => double("branch", :remote_name => "origin", :name => "master", :tracking_branch_name => "master", :tracking_status => :behind))))
+      @ahead_submodule  = double("submodule", :path => "ahead",  :git => double("git", :path => "ahead" , :branch => double("branch_command", :current => double("branch", :remote_name => "origin", :name => "master", :tracking_branch_name => "master", :tracking_status => :ahead))))
+      @git.submodule.stub(:all).and_return([@behind_submodule, @ahead_submodule])
       
       @ahead_submodule.git.should_receive(:push).and_return("")
       @behind_submodule.git.should_not_receive(:push)
       
       @controller = RemoteController.singleton_new
-      @controller.stub!(:display_push_output)
+      @controller.stub(:display_push_output)
       @output = capture_output do
         dispatch :controller => "remote", :action => "push"
       end
@@ -114,7 +114,7 @@ describe RemoteController do
   describe "pushing a tag" do
     before(:each) do
       @git = Git.singleton_new
-      @git.remote.stub!(:names).and_return(["origin"])
+      @git.remote.stub(:names).and_return(["origin"])
       @controller = RemoteController.singleton_new
       def @controller.for_each_selected_remote(options = {}, &block)
         yield "origin"

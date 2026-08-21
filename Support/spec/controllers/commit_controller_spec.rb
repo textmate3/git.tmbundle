@@ -17,7 +17,7 @@ describe CommitController do
       @message = "My commit message"
       @git.should_receive(:merge_message).and_return(nil)
       @worker = PartialCommitWorker::Normal.singleton_new(@git)
-      @worker.stub!(:show_commit_dialog).and_return([@message, ["file1.txt", "file2.txt"]])
+      @worker.stub(:show_commit_dialog).and_return([@message, ["file1.txt", "file2.txt"]])
       
       @git.should_receive(:commit).
         with("My commit message", ["file1.txt", "file2.txt"], :amend => false).
@@ -27,7 +27,7 @@ describe CommitController do
         with(:path => ".", :revisions => "1234567^..1234567").
         and_return( Parsers.parse_diff(fixture_file("small.diff")) )
       
-      @git.branch.stub!(:current_name).and_return("master")
+      @git.branch.stub(:current_name).and_return("master")
       @output = capture_output do
         dispatch(:controller => "commit")
       end
@@ -51,7 +51,7 @@ describe CommitController do
       @message = "My commit message"
       @git.should_receive(:merge_message).and_return(nil)
       @worker = PartialCommitWorker::Amend.singleton_new(@git)
-      @worker.stub!(:show_commit_dialog).and_return([@message, ["file1.txt", "file2.txt"]])
+      @worker.stub(:show_commit_dialog).and_return([@message, ["file1.txt", "file2.txt"]])
       
       @git.should_receive(:commit).
         with("My commit message", ["file1.txt", "file2.txt"], :amend => true).
@@ -61,7 +61,7 @@ describe CommitController do
         with(:path => ".", :revisions => "1234567^..1234567").
         and_return( Parsers.parse_diff(fixture_file("small.diff")) )
         
-      @git.branch.stub!(:current_name).and_return("master")
+      @git.branch.stub(:current_name).and_return("master")
       
       @output = capture_output do
         dispatch(:controller => "commit", :type => "amend")

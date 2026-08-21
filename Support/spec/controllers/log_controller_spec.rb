@@ -11,7 +11,7 @@ describe LogController do
   describe "showing a log" do
     before(:each) do
       Git.command_response["log", "--date=default", "--format=medium", "-n", Git::Config::DEFAULT_LOG_LIMIT, "."] = fixture_file("log.txt")
-      @git.branch.stub!(:current).and_return branch_stub(:name => "refs/heads/master")
+      @git.branch.stub(:current).and_return branch_stub(:name => "refs/heads/master")
       @output = capture_output do
         dispatch :controller => "log", :action => "index", :path => "."
       end
@@ -37,8 +37,8 @@ describe LogController do
     end
     
     it "should show an outgoing log for all diverged or ahead branches" do
-      @git.branch.stub!(:all).and_return([@master, @release, @task])
-      @git.submodule.stub!(:all).and_return([])
+      @git.branch.stub(:all).and_return([@master, @release, @task])
+      @git.submodule.stub(:all).and_return([])
       
       @controller.should_receive(:render_component).with(:action => "log", :git_path => @git.path, :branches => "refs/remotes/origin/release..refs/heads/release")
       @controller.should_receive(:render_component).with(:action => "log", :git_path => @git.path, :branches => "refs/remotes/origin/task..refs/heads/task")
@@ -49,17 +49,17 @@ describe LogController do
     end
     
     it "should show an outgoing branch log for all submodules" do
-      @git.branch.stub!(:all).and_return([])
-      @submodule = stub("submodule",
-        :git => stub("git", 
+      @git.branch.stub(:all).and_return([])
+      @submodule = double("submodule",
+        :git => double("git", 
           :path => "submodule_path", 
-          :branch => stub("branch_command",
+          :branch => double("branch_command",
             :all => [@master, @release, @task]
           )
         )
       )
       
-      @git.submodule.stub!(:all).and_return([@submodule])
+      @git.submodule.stub(:all).and_return([@submodule])
       
       @controller.should_receive(:render_component).with(:action => "log", :git_path => @submodule.git.path, :branches => "refs/remotes/origin/release..refs/heads/release")
       @controller.should_receive(:render_component).with(:action => "log", :git_path => @submodule.git.path, :branches => "refs/remotes/origin/task..refs/heads/task")

@@ -2,7 +2,7 @@ module FormatHelpers
   module TagHelper
     # Adapted from RubyOnRails
     BOOLEAN_ATTRIBUTES = %w(disabled readonly multiple)
-    SELF_CLOSABLE_TAGS = %w(img br hr)
+    SELF_CLOSABLE_TAGS = %w(img br hr input)
     def content_tag_string(name, content = nil, options = {}, escape = true, close = true)
       if content || ! SELF_CLOSABLE_TAGS.include?(name.to_s)
         "#{content_tag_string_open(name, options)}#{content}#{content_tag_string_close(name)}"

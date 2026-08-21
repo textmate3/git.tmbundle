@@ -18,8 +18,8 @@ describe SCM::Git do
   end
   
   it "should auto_add_rm files depending on their existence" do
-    File.stub!(:exist?).with("/base/existing_file.txt").and_return(true)
-    File.stub!(:exist?).with("/base/deleted_file.txt").and_return(false)
+    File.stub(:exist?).with("/base/existing_file.txt").and_return(true)
+    File.stub(:exist?).with("/base/deleted_file.txt").and_return(false)
     @git.should_receive(:add).with(["existing_file.txt"]).and_return("")
     @git.should_receive(:rm).with(["deleted_file.txt"]).and_return("")
     @git.auto_add_rm(["existing_file.txt", "deleted_file.txt"])

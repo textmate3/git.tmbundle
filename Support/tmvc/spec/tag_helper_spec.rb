@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + "/spec_helper.rb"
 describe FormatHelpers::TagHelper do
   include SpecHelpers
+  include FormatHelpers::TagHelper
   
   it "should return a formatted tag in non-block notation" do
     content_tag(:script, "", :type => "javascript", :src => "prototype.js").should == "<script src=\"prototype.js\" type=\"javascript\"></script>"

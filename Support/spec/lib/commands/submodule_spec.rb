@@ -47,7 +47,7 @@ EOF
     before(:each) do
       @path = "vendor/plugins/acts_as_plugin"
       @submodule = SCM::Git::Submodule::SubmoduleProxy.new(@git, @git.submodule, :current_revision => "6789", :revision => "1234", :path => @path, :tag => "release")
-      @submodule.stub!(:url).and_return("git@url.com/path/to/repo.git")
+      @submodule.stub(:url).and_return("git@url.com/path/to/repo.git")
     end
     
     it "should cache" do
@@ -68,13 +68,13 @@ EOF
     
     it "should return a Git object for the submodule" do
       @git.should_receive(:with_path).with(File.join(@git.path, @path)).and_return(
-        mock("git", :current_revision => "1234")
+        double("git", :current_revision => "1234")
       )
       @submodule.git
     end
     
     it "should query it's current_revision when asked" do
-      @submodule.stub!(:git).and_return stub("git", :current_revision => "1234")
+      @submodule.stub(:git).and_return double("git", :current_revision => "1234")
       @submodule.current_revision(true).should == "1234"
     end
     
@@ -89,24 +89,24 @@ EOF
     end
     
     it "should be modified when current_revision and revision differ" do
-      @submodule.stub!(:cloned?).and_return(true)
+      @submodule.stub(:cloned?).and_return(true)
       @submodule.should be_modified
     end
     
     it "should be not modified when current_revision and revision are the same" do
-      @submodule.stub!(:cloned?).and_return(true)
+      @submodule.stub(:cloned?).and_return(true)
       @submodule.should_receive(:current_revision).and_return @submodule.revision
       @submodule.should_not be_modified
     end
     
     it "should not be modified if not yet checked out" do
-      @submodule.stub!(:cloned?).and_return(false)
+      @submodule.stub(:cloned?).and_return(false)
       @submodule.should_not_receive(:current_revision)
       @submodule.should_not be_modified
     end
     
     it "should not be cloned if the .git directory doesn't exist" do
-      @submodule.stub!(:cached?).and_return(false)
+      @submodule.stub(:cached?).and_return(false)
       File.should_receive(:exist?).with(File.join(@submodule.abs_path, ".git")).and_return(false)
       @submodule.should_not be_cloned
     end
