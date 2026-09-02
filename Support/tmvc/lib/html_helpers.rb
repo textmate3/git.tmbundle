@@ -10,8 +10,11 @@ module HtmlHelpers
   end
     
 protected  
+  # The page is served from TextMate's own scheme, and a page served from a
+  # custom scheme cannot load file:// subresources, so assets are requested
+  # back through that scheme and TextMate reads them from disk.
   def resource_url(filename)
-    "file://" + e_url("#{ENV['TM_BUNDLE_SUPPORT']}/resource/#{filename}")
+    "x-txmt-filehandle://" + e_url("#{ENV['TM_BUNDLE_SUPPORT']}/resource/#{filename}")
   end
   
   def select_box(name, select_options = [], options = {})
