@@ -1,5 +1,9 @@
 /* Git JS gateway */
 /* Tim Harper (tim.harper at leadmediapartners.org) */
+
+/* TextMate.system() is asynchronous, so every helper here returns a promise that
+   resolves to the command's standard output. Callers update the page in then(). */
+
 function e_sh(str) { 
   return '"' + (str.toString().gsub('"', '\\"').gsub('\\$', '\\$')) + '"';
 }
@@ -9,33 +13,22 @@ function exec(command, params) {
   return TextMate.system(command + " " + params, null)
 }
 
-function ENV(var_name) {
-  return TextMate.system("echo $" + var_name, null).outputString.strip();
+function output_of(promise) {
+  return promise.then(
+    function(task) { return task.outputString },
+    function(err)  { return "ERROR!" + err }
+  )
 }
 
 function gateway_command(command, params) {
-  // var cmd = arguments.shift
-  // var params = arguments
-  try {
-    command = "ruby " + e_sh(TM_BUNDLE_SUPPORT) + "/gateway/" + command
-    return exec(command, params).outputString
-  }
-  catch(err) {
-    return "ERROR!" + err;
-  }
+  command = "ruby " + e_sh(TM_BUNDLE_SUPPORT) + "/gateway/" + command
+  return output_of(exec(command, params))
 }
 
-
 function dispatch(params) {
-  try {
-    params = $H(params).map(function(pair) { return(pair.key + "=" + pair.value.toString())})
-    command = "ruby " + e_sh(TM_BUNDLE_SUPPORT) + "/dispatch.rb";
-    // return params.map(function(a) { return e_sh(a) }).join(" ")
-    return exec(command, params).outputString
-  }
-  catch(err) {
-    return "ERROR!" + err;
-  }
+  params = $H(params).map(function(pair) { return(pair.key + "=" + pair.value.toString())})
+  command = "ruby " + e_sh(TM_BUNDLE_SUPPORT) + "/dispatch.rb";
+  return output_of(exec(command, params))
 }
 
 function dispatch_streaming(iframe_target, options) {
@@ -50,21 +43,22 @@ StreamingDispatchExecuter.prototype = {
     this.on_complete = options["on_complete"]
     params = options['params']
     params['streaming']="true"
-    var parts = dispatch(options['params']).split(",")
-    this.port = parts[0];
-    this.pid = parts[1];
-    $(iframe_target).src = "http://127.0.0.1:" + this.port + "/"
-    try {
-      new PeriodicalExecuter(function(pe) { 
-        if (TextMate.system("kill -0 " + this.pid, null).status == 1) {
-          pe.stop()
-          if (this.on_complete) this.on_complete();
-        }
-      }.bindAsEventListener(this), 0.5)
-    } catch(e) {$('debug').update(e)}
-    
+    dispatch(params).then(function(output) {
+      var parts = output.split(",")
+      this.port = parts[0];
+      this.pid = parts[1];
+      $(iframe_target).src = "http://127.0.0.1:" + this.port + "/"
+      this.wait_for_exit()
+    }.bind(this))
   },
-  
-}
 
-TM_BUNDLE_SUPPORT = ENV('TM_BUNDLE_SUPPORT')
+  wait_for_exit: function() {
+    TextMate.system("kill -0 " + this.pid, function(task) {
+      if (task.status == 1) {
+        if (this.on_complete) this.on_complete();
+      } else {
+        setTimeout(this.wait_for_exit.bind(this), 500)
+      }
+    }.bind(this))
+  },
+}

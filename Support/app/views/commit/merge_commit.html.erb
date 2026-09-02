@@ -10,6 +10,6 @@
       <textarea id="commit_message" name='commit_message' cols="80" rows="20"><%= @message %></textarea>
     </div>
     
-    <input type="button" name="commit" value="Commit" onclick="$('commit_output').update(dispatch({controller: 'commit', action: 'merge_commit', message: $F('commit_message')}));"/>
+    <input type="button" name="commit" value="Commit" onclick="dispatch({controller: 'commit', action: 'merge_commit', message: $F('commit_message')}).then(function(html) { $('commit_output').update(html) });"/>
   </div>
 <% end %>

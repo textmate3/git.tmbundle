@@ -14,20 +14,23 @@ function set_togglable_visibility(dom_id, state) {
 
 function toggle_diff(dom_id) {
   e = $(dom_id)
-  if (! e.readAttribute("loaded")) {
-    e.update(dispatch({controller: 'diff', action: 'diff', revision: e.readAttribute("rev"), git_path: e.readAttribute("git_path"), path: (e.readAttribute("path") || ""), layout: false}))
-    e.setAttribute("loaded", "");
+  var show = ! e.visible()
+  if (e.readAttribute("loaded")) {
+    set_togglable_visibility( dom_id, show );
+    return
   }
-  
-  set_togglable_visibility( dom_id, ! e.visible() );
+  e.setAttribute("loaded", "");
+  dispatch({controller: 'diff', action: 'diff', revision: e.readAttribute("rev"), git_path: e.readAttribute("git_path"), path: (e.readAttribute("path") || ""), layout: false}).then(function(html) {
+    e.update(html)
+    set_togglable_visibility( dom_id, show );
+  })
 }
 
 function toggle_log(dom_id) {
   e = $(dom_id)
-  if (! e.readAttribute("loaded")) {
-    e.update(dispatch({controller: 'log', action: 'log', revisions: e.readAttribute("revisions"), git_path: e.readAttribute("git_path"), path: (e.readAttribute("path") || ""), layout: false}))
-    // e.setAttribute("loaded");
-  }
-  
-  set_togglable_visibility( dom_id, ! e.visible() );
+  var show = ! e.visible()
+  dispatch({controller: 'log', action: 'log', revisions: e.readAttribute("revisions"), git_path: e.readAttribute("git_path"), path: (e.readAttribute("path") || ""), layout: false}).then(function(html) {
+    e.update(html)
+    set_togglable_visibility( dom_id, show );
+  })
 }
