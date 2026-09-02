@@ -13,9 +13,15 @@ function exec(command, params) {
   return TextMate.system(command + " " + params, null)
 }
 
+/* A command that printed nothing but complained gets its complaint shown in the
+   page, since a silently empty result is what made these failures invisible. */
 function output_of(promise) {
   return promise.then(
-    function(task) { return task.outputString },
+    function(task) {
+      if (task.outputString == "" && task.errorString != "")
+        return "<pre class='error'>" + task.errorString.escapeHTML() + "</pre>"
+      return task.outputString
+    },
     function(err)  { return "ERROR!" + err }
   )
 }
