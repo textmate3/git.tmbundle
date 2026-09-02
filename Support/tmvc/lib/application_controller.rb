@@ -71,6 +71,7 @@ class ApplicationController
   def start_layout
     return if @layout_rendered
     @layout_rendered = true
+    return if params[:layout].to_s == "false"
     this_actions_layout = self.class.layout_for_action(params[:action])
     return unless this_actions_layout
     
