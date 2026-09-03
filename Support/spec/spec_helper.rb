@@ -17,6 +17,11 @@ SpecHelpers::PUTS_CAPTURE_CLASSES << ::Git
 RSpec.configure do |config|
   config.include SpecHelpers
 
+  # A controller that discards its output sets $exit_status, which tmvc turns into
+  # the process exit code from an at_exit hook. Under the suite that would make a
+  # green run exit 200, so the status is cleared after every example.
+  config.after(:each) { $exit_status = nil }
+
   # This suite was written for RSpec 1. The should expectation syntax and the
   # should_receive/stub mock syntax are still supported by rspec-expectations
   # and rspec-mocks behind these settings.
