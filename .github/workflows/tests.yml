@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: macos-26
+    env:
+      TM_SUPPORT_PATH: ${{ github.workspace }}/bundle-support.tmbundle/Support/shared
+      TM_BUNDLE_SUPPORT: ${{ github.workspace }}/Support
+      TM_BUNDLE_PATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v7
+      # The shared library the bundle's Ruby code requires through TM_SUPPORT_PATH,
+      # with its vendored CFPropertyList, which is a submodule.
+      - uses: actions/checkout@v7
+        with:
+          repository: textmate3/bundle-support.tmbundle
+          path: bundle-support.tmbundle
+          submodules: true
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      # Two suites: the controllers and libraries, and the bundle's own miniature
+      # model view controller framework under Support/tmvc.
+      - run: bundle exec rspec Support/spec Support/tmvc/spec
